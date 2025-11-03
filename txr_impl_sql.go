@@ -43,15 +43,23 @@ type TxrImplSql struct {
 // Create
 // ---------------------------------------------------------------------------------------------------------------------
 
-// NewTxrImplSql
+// NewTxrImplSql - see TxrImplSql.
 //
-// See TxrImplSql
+// Panics, if db or deadlockDetectionFn argument is nil.
 func NewTxrImplSql(
 	db *sql.DB,
 	deadlockMaxRetries uint,
 	deadlockMinRetryInterval time.Duration,
 	deadlockDetectionFn func(error) bool,
 ) *TxrImplSql {
+	if db == nil {
+		panic("NewTxrImplSql : db must not be nil")
+	}
+
+	if deadlockDetectionFn == nil {
+		panic("NewTxrImplSql : deadlockDetectionFn must not be nil")
+	}
+
 	return &TxrImplSql{
 		db:                       db,
 		deadlockMaxRetries:       deadlockMaxRetries,
