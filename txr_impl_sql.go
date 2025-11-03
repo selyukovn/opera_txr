@@ -134,12 +134,57 @@ func (t *TxrImplSql) tx(
 		return err
 	}
 
-	txCtx := WithTxCtx(ctx, sqlTx)
-
-	err = fn(txCtx)
+	err = t.txFn(ctx, sqlTx, fn)
 
 	if err == nil && isWritable {
 		err = sqlTx.Commit()
+	}
+
+	return err
+}
+
+func (t *TxrImplSql) txFn(
+	ctx context.Context,
+	sqlTx *sql.Tx,
+	fn func(txCtx *TxCtx) error,
+) error {
+	// Here we block current goroutine until ctx is done or fn is completed.
+	// Fn runs in a separate goroutine, but appears synchronous to client code
+	// due to blocking by the select statement and panic propagation.
+
+	var err error
+
+	txCtx := WithTxCtx(ctx, sqlTx)
+
+	type fnChanResult = struct {
+		err   error
+		panic any
+	}
+
+	fnChan := make(chan fnChanResult)
+
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fnChan <- fnChanResult{panic: r}
+			}
+			close(fnChan)
+		}()
+
+		err := fn(txCtx)
+
+		fnChan <- fnChanResult{err: err}
+	}()
+
+	select {
+	case <-ctx.Done():
+		err = ctx.Err()
+	case r := <-fnChan:
+		if r.panic != nil {
+			panic(r.panic)
+		}
+
+		err = r.err
 	}
 
 	return err
