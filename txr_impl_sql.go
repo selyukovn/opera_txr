@@ -81,7 +81,7 @@ func NewTxrImplSql(
 //   - fn panics
 //
 // Returns the error returned by fn, or a runtime error if processing fails.
-func (t *TxrImplSql) Tx(ctx context.Context, fn func(txCtx *TxCtx) error) error {
+func (t *TxrImplSql) Tx(ctx context.Context, fn func(ctx *TxCtx) error) error {
 	return t.processTx(true, ctx, fn)
 }
 
@@ -89,7 +89,7 @@ func (t *TxrImplSql) processTx(
 	// todo : perhaps, there should be RO/RW-transactions ???
 	isWritable bool,
 	ctx context.Context,
-	fn func(txCtx *TxCtx) error,
+	fn func(ctx *TxCtx) error,
 ) error {
 	if ctx == nil {
 		panic(fmt.Errorf("%T : ctx must not be nil", t))
@@ -150,7 +150,7 @@ func (t *TxrImplSql) processTx(
 func (t *TxrImplSql) tx(
 	isWritable bool,
 	ctx context.Context,
-	fn func(txCtx *TxCtx) error,
+	fn func(ctx *TxCtx) error,
 ) error {
 	sqlTx, err := t.db.BeginTx(ctx, nil)
 
@@ -178,7 +178,7 @@ func (t *TxrImplSql) tx(
 func (t *TxrImplSql) txFn(
 	ctx context.Context,
 	sqlTx *sql.Tx,
-	fn func(txCtx *TxCtx) error,
+	fn func(ctx *TxCtx) error,
 ) error {
 	// Here we block current goroutine until ctx is done or fn is completed.
 	// Fn runs in a separate goroutine, but appears synchronous to client code

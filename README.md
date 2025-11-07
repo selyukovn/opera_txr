@@ -101,14 +101,14 @@ func (s *OperationLayerService) SomeUseCase(email Email) {
 	// ...
 
 	var accId account.Id
-	if err := s.txr.Tx(ctx, func(txCtx *opera_txr.TxCtx) error {
-		acc, err := s.accRepo.GetByEmail(txCtx, email)
+	if err := s.txr.Tx(ctx, func(ctx *opera_txr.TxCtx) error {
+		acc, err := s.accRepo.GetByEmail(ctx, email)
 		// ... if err != nil { return err } ...
 
 		err = acc.DoSomething()
 		// ... if err != nil { return err } ...
 
-		err = s.accRepo.Update(txCtx, acc)
+		err = s.accRepo.Update(ctx, acc)
 		// ... if err != nil { return err } ...
 
 		accId = acc.Id()
