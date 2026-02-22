@@ -1,3 +1,20 @@
+## [0.4.0] - 2026-02-22
+
+### BREAKING CHANGES
+
+- `TxCtx` is removed, `context.Context` abstraction is used instead. 
+  Use `TxFromCtx()` to get transaction values from context.
+
+- `IsInTxCtx()` is renamed to `InTxCtx()`.
+
+### IMPROVEMENTS
+
+- `WithTxCtx()`, `InTxCtx()`, `TxFromCtx()` panic in case of invalid arguments.
+
+- A bit more readable go-doc.
+
+---
+
 ## [0.3.0] - 2025-12-14
 
 ### BREAKING CHANGES
