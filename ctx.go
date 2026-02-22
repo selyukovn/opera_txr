@@ -6,15 +6,17 @@ import (
 
 const ctxValueKeyTx = "opera_txr.Tx"
 
-// WithTxCtx
+// WithTxCtx derives context with provided transaction.
 //
-// tx is of type any because this is an abstraction.
-// The concrete type of the transaction (or whatever it may be — perhaps just an identifier)
-// will depend on the specific implementation of TxrInterface and related repository implementations.
+// Use it within your own implementation of the TxrInterface.
+//
+// `tx` is of type `any` because this is an abstraction.
+// Specific type of the transaction (or whatever it may be — perhaps just an identifier)
+// depends on the specific implementation of the TxrInterface and related repositories implementations.
 //
 // Panics if:
-//   - ctx is nil
-//   - tx is nil
+//   - `ctx` is nil.
+//   - `tx` is nil.
 func WithTxCtx(ctx context.Context, tx any) context.Context {
 	if ctx == nil {
 		panic("`ctx` must not be nil")
@@ -25,11 +27,9 @@ func WithTxCtx(ctx context.Context, tx any) context.Context {
 	return context.WithValue(ctx, ctxValueKeyTx, tx)
 }
 
-// IsTxCtx
+// IsTxCtx checks if the given context is derived by WithTxCtx.
 //
-// Checks if the given context is derived by WithTxCtx.
-//
-// Panics if ctx is nil.
+// Panics if `ctx` is nil.
 func IsTxCtx(ctx context.Context) bool {
 	if ctx == nil {
 		panic("`ctx` must not be nil")
@@ -38,11 +38,11 @@ func IsTxCtx(ctx context.Context) bool {
 	return ctx.Value(ctxValueKeyTx) != nil
 }
 
-// TxFromCtx
+// TxFromCtx gets transaction from the context derived by WithTxCtx.
 //
-// See WithTxCtx for explanation of "any" return type.
+// Panics if `ctx` is nil.
 //
-// Panics if ctx is nil.
+// Returns `nil` if IsTxCtx returns false for `ctx`.
 func TxFromCtx(ctx context.Context) any {
 	if ctx == nil {
 		panic("`ctx` must not be nil")

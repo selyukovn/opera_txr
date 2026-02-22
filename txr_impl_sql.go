@@ -45,7 +45,7 @@ type TxrImplSql struct {
 
 // NewTxrImplSql - see TxrImplSql.
 //
-// Panics, if db or deadlockDetectionFn argument is nil.
+// Panics, if `db` or `deadlockDetectionFn` argument is nil.
 func NewTxrImplSql(
 	db *sql.DB,
 	deadlockMaxRetries uint,
@@ -72,15 +72,15 @@ func NewTxrImplSql(
 // Actions
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Tx runs the provided function fn within a transaction context.
+// Tx runs the provided function `fn` within a transaction context.
 //
 // Panics if:
-//   - ctx is nil (programming error: caller must provide a valid context)
+//   - `ctx` is nil (programming error: caller must provide a valid context)
 //   - nested calls (makes no sense and likely indicates a design flaw)
-//   - fn is nil (programming error: transaction body must be provided)
-//   - fn panics
+//   - `fn` is nil (programming error: transaction body must be provided)
+//   - `fn` panics
 //
-// Returns the error returned by fn, or a runtime error if processing fails.
+// Returns the error returned by `fn`, or a runtime error if processing fails.
 func (t *TxrImplSql) Tx(ctx context.Context, fn func(ctx context.Context) error) error {
 	return t.processTx(true, ctx, fn)
 }
