@@ -19,11 +19,11 @@ import (
 //   - Minimum retry interval (base for exponential backoff).
 //   - Custom deadlock detection function (since SQL drivers use different error codes/messages).
 //
-// In this implementation, TxCtx.Tx holds a pointer to a sql.Tx instance.
+// In this implementation, context holds a pointer to a sql.Tx instance.
 // To retrieve it in a repository method from context see the code example below:
 //
 //	func (r *SomeRepoOrSo) SomeMethod(ctx context.Context, ...) ... {
-//	    tx := ctx.(*opera_txr.TxCtx).Tx().(*sql.Tx)
+//	    tx := opera_txr.TxFromCtx(ctx).(*sql.Tx)
 //	    // ...
 //	}
 type TxrImplSql struct {
@@ -72,7 +72,7 @@ func NewTxrImplSql(
 // Actions
 // ---------------------------------------------------------------------------------------------------------------------
 
-// Tx runs the provided function fn within a transaction context TxCtx.
+// Tx runs the provided function fn within a transaction context.
 //
 // Panics if:
 //   - ctx is nil (programming error: caller must provide a valid context)
@@ -81,7 +81,7 @@ func NewTxrImplSql(
 //   - fn panics
 //
 // Returns the error returned by fn, or a runtime error if processing fails.
-func (t *TxrImplSql) Tx(ctx context.Context, fn func(ctx *TxCtx) error) error {
+func (t *TxrImplSql) Tx(ctx context.Context, fn func(ctx context.Context) error) error {
 	return t.processTx(true, ctx, fn)
 }
 
@@ -89,11 +89,11 @@ func (t *TxrImplSql) processTx(
 	// todo : perhaps, there should be RO/RW-transactions ???
 	isWritable bool,
 	ctx context.Context,
-	fn func(ctx *TxCtx) error,
+	fn func(ctx context.Context) error,
 ) error {
 	if ctx == nil {
 		panic(fmt.Errorf("%T : ctx must not be nil", t))
-	} else if IsInTxCtx(ctx) {
+	} else if IsTxCtx(ctx) {
 		panic(fmt.Errorf("%T : nested transactions are not allowed", t))
 	}
 
@@ -150,7 +150,7 @@ func (t *TxrImplSql) processTx(
 func (t *TxrImplSql) tx(
 	isWritable bool,
 	ctx context.Context,
-	fn func(ctx *TxCtx) error,
+	fn func(ctx context.Context) error,
 ) error {
 	sqlTx, err := t.db.BeginTx(ctx, nil)
 

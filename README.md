@@ -23,8 +23,7 @@ err = txr.Tx(func() error {
 Such closures contain, for example, repository methods calls.
 An active transaction must be accessible in repository methods that are called within that transaction.
 The most natural way to do this in Go -- send an active transaction through the `context.Context` to each call.
-`TxCtx` is used for this -- it implements context interface and provides `Tx` method to get an actual transaction
-inside repository methods.
+`TxFromCtx()` is used for this -- it gets an actual transaction inside repository methods.
 
 See examples for details.
 
@@ -51,7 +50,7 @@ func (s *OperationLayerService) SomeUseCase(ctx context.Context, email Email) {
 	// ...
 
 	var accId account.Id
-	if err := s.txr.Tx(ctx, func(ctx *opera_txr.TxCtx) error {
+	if err := s.txr.Tx(ctx, func(ctx context.Context) error {
 		acc, err := s.accRepo.GetByEmail(ctx, email)
 
 		// ...
@@ -70,9 +69,9 @@ func (s *OperationLayerService) SomeUseCase(ctx context.Context, email Email) {
 func (r *AccountRepositoryImplSql) GetByEmail(ctx context.Context, email Email) (*Account, error) {
 	// Here, inside SQL-implementation of the repository,
 	// we expect, that SQL-implementation of the `TxrInterface` is used,
-	// and `*TxCtx.Tx` provides `*sql.Tx` value.
+	// and `*sql.Tx` is a type of the transaction.
 	// So this is how to get actual transaction in 1 line of code:
-	tx := ctx.(*opera_txr.TxCtx).Tx().(*sql.Tx)
+	tx := opera_txr.TxFromCtx(ctx).(*sql.Tx)
 
 	// Usual usage of *sql.Tx ...
 	result, err := tx.QueryRowContext(ctx, "SELECT ...")

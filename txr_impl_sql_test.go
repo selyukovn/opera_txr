@@ -61,7 +61,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 
 		// no ctx
 		assert.Panics(t, func() {
-			_ = txr.Tx(nil, func(ctx *TxCtx) error { return nil })
+			_ = txr.Tx(nil, func(ctx context.Context) error { return nil })
 		})
 
 		// no fn
@@ -73,8 +73,8 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		assert.Panics(t, func() {
 			mock.ExpectBegin() // outer transaction started
 
-			_ = txr.Tx(context.Background(), func(ctx *TxCtx) error {
-				return txr.Tx(ctx, func(ctx2 *TxCtx) error {
+			_ = txr.Tx(context.Background(), func(ctx context.Context) error {
+				return txr.Tx(ctx, func(ctx2 context.Context) error {
 					return nil
 				})
 			})
@@ -93,8 +93,8 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectCommit()
 
-		err := txr.Tx(context.Background(), func(ctx *TxCtx) error {
-			assert.IsType(t, &sql.Tx{}, ctx.Tx())
+		err := txr.Tx(context.Background(), func(ctx context.Context) error {
+			assert.IsType(t, &sql.Tx{}, TxFromCtx(ctx))
 			return nil
 		})
 
@@ -112,7 +112,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		panicValue := errors.New("panic error")
 
 		assert.PanicsWithValue(t, panicValue, func() {
-			_ = txr.Tx(context.Background(), func(ctx *TxCtx) error {
+			_ = txr.Tx(context.Background(), func(ctx context.Context) error {
 				panic(panicValue)
 			})
 		})
@@ -129,7 +129,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectRollback()
 
-		err := txr.Tx(context.Background(), func(ctx *TxCtx) error {
+		err := txr.Tx(context.Background(), func(ctx context.Context) error {
 			return expectedErr
 		})
 
@@ -153,7 +153,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectCommit().WillReturnError(nil)
 
-		err := txr.Tx(context.Background(), func(ctx *TxCtx) error {
+		err := txr.Tx(context.Background(), func(ctx context.Context) error {
 			return nil
 		})
 
@@ -178,7 +178,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectCommit().WillReturnError(deadlockErr)
 
-		err := txr.Tx(context.Background(), func(ctx *TxCtx) error {
+		err := txr.Tx(context.Background(), func(ctx context.Context) error {
 			return nil
 		})
 
@@ -197,7 +197,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel() // before tx
 
-		err := txr.Tx(ctx, func(ctx *TxCtx) error {
+		err := txr.Tx(ctx, func(ctx context.Context) error {
 			return errors.New("should not reach here")
 		})
 
@@ -217,7 +217,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 		mock.ExpectBegin()
 		mock.ExpectRollback()
 
-		err := txr.Tx(ctx, func(ctx *TxCtx) error {
+		err := txr.Tx(ctx, func(ctx context.Context) error {
 			// Responsibility is fully on dev, not on the `Txr.Tx` anymore.
 			select {
 			case <-ctx.Done():
@@ -250,7 +250,7 @@ func Test_TxrImplSql_Tx(t *testing.T) {
 				assert.Contains(t, s, "testHelper_TxrImplSql_Tx_namedMethodForStackTrace")
 			}()
 
-			_ = txr.Tx(ctx, func(ctx *TxCtx) error {
+			_ = txr.Tx(ctx, func(ctx context.Context) error {
 				testHelper_TxrImplSql_Tx_namedMethodForStackTrace(func() {
 					panic([]int{1, 2, 3})
 				})
