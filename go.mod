@@ -1,4 +1,4 @@
-module github.com/selyukovn/go-opera-txr
+module github.com/selyukovn/go-txr
 
 go 1.18
 

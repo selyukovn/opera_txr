@@ -1,4 +1,4 @@
-package opera_txr
+package txr
 
 import (
 	"context"
@@ -23,7 +23,7 @@ import (
 // To retrieve it in a repository method from context see the code example below:
 //
 //	func (r *SomeRepoOrSo) SomeMethod(ctx context.Context, ...) ... {
-//	    tx := opera_txr.TxFromCtx(ctx).(*sql.Tx)
+//	    tx := txr.TxFromCtx(ctx).(*sql.Tx)
 //	    // ...
 //	}
 type TxrImplSql struct {

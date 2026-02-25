@@ -1,10 +1,10 @@
-package opera_txr
+package txr
 
 import (
 	"context"
 )
 
-const ctxValueKeyTx = "opera_txr.Tx"
+const ctxValueKeyTx = "txr.Tx"
 
 // WithTxCtx derives context with provided transaction.
 //

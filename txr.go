@@ -1,4 +1,4 @@
-package opera_txr
+package txr
 
 import (
 	"context"

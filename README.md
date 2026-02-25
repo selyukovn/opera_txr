@@ -1,14 +1,18 @@
 
-# Operational Layer Transactor
+# Transactor
 
 ### TL;DR
 
-A simple transaction manager for the operational layer.
+A simple transaction manager for eliminating boilerplate code 
+and providing an abstraction for the operation layer in Clean Architecture-based projects.
 
 ### Here's the thing
 
-Transaction management is the responsibility of the _operational layer_.
-Usage of _infrastructure layer_ libraries like `database/sql` on the operational layer breaks dependency direction.
+The main reason for this package creation was to eliminate boilerplate code of transaction management
+and to provide an abstraction, that can be used in the operation layer in Clean Architecture-based projects.
+
+In Clean Architecture-based projects the _operational layer_ is responsible for transaction management.
+Usage of _infrastructure layer_ libraries like `database/sql` in the operational layer breaks dependency direction.
 Moreover, higher‑level control and error handling (e.g., deadlocks) are useful, so some wrapper is rather required.
 Probably, the most laconic form of such wrapper is a method that accepts the transaction body as a closure.
 
@@ -34,14 +38,14 @@ package some_package
 
 import (
 	"context"
-	"github.com/selyukovn/go-opera-txr"
+	"github.com/selyukovn/go-txr"
     ".../domain/account"
 	// ...
 )
 
 type OperationLayerService struct {
 	// ...
-	txr     opera_txr.TxrInterface
+	txr     txr.TxrInterface
 	accRepo account.RepositoryInterface
 	// ...
 }
@@ -71,7 +75,7 @@ func (r *AccountRepositoryImplSql) GetByEmail(ctx context.Context, email Email) 
 	// we expect, that SQL-implementation of the `TxrInterface` is used,
 	// and `*sql.Tx` is a type of the transaction.
 	// So this is how to get actual transaction in 1 line of code:
-	tx := opera_txr.TxFromCtx(ctx).(*sql.Tx)
+	tx := txr.TxFromCtx(ctx).(*sql.Tx)
 
 	// Usual usage of *sql.Tx ...
 	result, err := tx.QueryRowContext(ctx, "SELECT ...")
