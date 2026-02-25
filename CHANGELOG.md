@@ -7,9 +7,13 @@ This was not mentioned as a `breaking change` and was incorrectly tagged as a bu
 
 *Note: v0.4.1 has been retracted.*
 
+---
+
 ## [0.4.1] - 2026-02-25
 
 Project renamed from `go-opera-txr` to `go-txr`.
+
+---
 
 ## [0.4.0] - 2026-02-22
 
