@@ -1,3 +1,12 @@
+## [0.5.0] - 2026-02-25
+
+### BREAKING CHANGES
+
+In `v0.4.1` the project was renamed, so the import paths were changed too.
+This was not mentioned as a `breaking change` and was incorrectly tagged as a bugfix. 
+
+*Note: v0.4.1 has been retracted.*
+
 ## [0.4.1] - 2026-02-25
 
 Project renamed from `go-opera-txr` to `go-txr`.
