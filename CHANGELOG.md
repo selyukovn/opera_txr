@@ -1,3 +1,7 @@
+## [0.4.1] - 2026-02-25
+
+Project renamed from `go-opera-txr` to `go-txr`.
+
 ## [0.4.0] - 2026-02-22
 
 ### BREAKING CHANGES
