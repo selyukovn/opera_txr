@@ -22,7 +22,7 @@ import (
 // In this implementation, context holds a pointer to a sql.Tx instance.
 // To retrieve it in a repository method from context see the code example below:
 //
-//	func (r *SomeRepoOrSo) SomeMethod(ctx context.Context, ...) ... {
+//	func (r SomeRepoOrSo) SomeMethod(ctx context.Context, ...) ... {
 //	    tx := txr.TxFromCtx(ctx).(*sql.Tx)
 //	    // ...
 //	}
@@ -51,7 +51,7 @@ func NewTxrImplSql(
 	deadlockMaxRetries uint,
 	deadlockMinRetryInterval time.Duration,
 	deadlockDetectionFn func(error) bool,
-) *TxrImplSql {
+) TxrImplSql {
 	if db == nil {
 		panic("NewTxrImplSql : db must not be nil")
 	}
@@ -60,7 +60,7 @@ func NewTxrImplSql(
 		panic("NewTxrImplSql : deadlockDetectionFn must not be nil")
 	}
 
-	return &TxrImplSql{
+	return TxrImplSql{
 		db:                       db,
 		deadlockMaxRetries:       deadlockMaxRetries,
 		deadlockMinRetryInterval: deadlockMinRetryInterval,
@@ -81,12 +81,12 @@ func NewTxrImplSql(
 //   - `fn` panics
 //
 // Returns the error returned by `fn`, or a runtime error if processing fails.
-func (t *TxrImplSql) Tx(ctx context.Context, fn func(ctx context.Context) error) error {
+func (t TxrImplSql) Tx(ctx context.Context, fn func(ctx context.Context) error) error {
 	return t.processTx(true, ctx, fn)
 }
 
-func (t *TxrImplSql) processTx(
-	// todo : perhaps, there should be RO/RW-transactions ???
+// todo : perhaps, there should be RO/RW-transactions ???
+func (t TxrImplSql) processTx(
 	isWritable bool,
 	ctx context.Context,
 	fn func(ctx context.Context) error,
@@ -147,7 +147,7 @@ func (t *TxrImplSql) processTx(
 	return nil
 }
 
-func (t *TxrImplSql) tx(
+func (t TxrImplSql) tx(
 	isWritable bool,
 	ctx context.Context,
 	fn func(ctx context.Context) error,
@@ -188,3 +188,5 @@ func (t *TxrImplSql) tx(
 
 	return err
 }
+
+// ---------------------------------------------------------------------------------------------------------------------

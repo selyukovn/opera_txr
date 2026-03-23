@@ -50,7 +50,7 @@ type OperationLayerService struct {
 	// ...
 }
 
-func (s *OperationLayerService) SomeUseCase(ctx context.Context, email Email) {
+func (s OperationLayerService) SomeUseCase(ctx context.Context, email Email) {
 	// ...
 
 	var accId account.Id
@@ -70,7 +70,7 @@ func (s *OperationLayerService) SomeUseCase(ctx context.Context, email Email) {
 
 // ----
 
-func (r *AccountRepositoryImplSql) GetByEmail(ctx context.Context, email Email) (*Account, error) {
+func (r AccountRepositoryImplSql) GetByEmail(ctx context.Context, email Email) (*Account, error) {
 	// Here, inside SQL-implementation of the repository,
 	// we expect, that SQL-implementation of the `TxrInterface` is used,
 	// and `*sql.Tx` is a type of the transaction.
