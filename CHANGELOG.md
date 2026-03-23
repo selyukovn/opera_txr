@@ -1,3 +1,11 @@
+## [0.6.0] - 2026-03-24
+
+### BREAKING CHANGES
+
+- `TxrImplSql` instances are used by values, not by pointers.
+
+---
+
 ## [0.5.0] - 2026-02-25
 
 ### BREAKING CHANGES
